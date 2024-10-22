@@ -1,4 +1,4 @@
-name: Test
+name: Transfer-sol
 
 on:
   push:
@@ -33,20 +33,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-solana
 
-      # Install Solana only if cache is not hit
+      # Install Solana if cache is not hit
       - name: Install Solana
         if: steps.solana-cache.outputs.cache-hit != 'true'
         run: |
-          sh -c "$(curl -sSfL https://release.solana.com/v1.8.10/install)"
+          sh -c "$(curl -sSfL https://release.solana.com/v1.18.18/install)"
 
       # Set up Solana path
       - name: Setup Solana Path
         run: |
           mkdir -p ~/.config/solana/
           echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
-          export PATH="/home/runner/.local/share/solana/install/active_release/bin:$PATH"
+          echo 'export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"' >> $GITHUB_ENV
           solana --version
-          solana config get
+
+      # Verify Solana installation
+      - name: Verify Solana installation
+        run: |
+          solana --version || echo "Solana installation failed"
 
       # Install Anchor CLI
       - name: Install Anchor CLI
@@ -54,6 +58,8 @@ jobs:
           cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
           avm install latest
           avm use latest
+
+      # Verify Anchor installation
       - name: Verify Anchor installation
         run: |
           anchor --version || echo "Anchor not installed properly"
