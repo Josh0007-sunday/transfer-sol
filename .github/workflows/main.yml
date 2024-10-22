@@ -20,9 +20,9 @@ jobs:
         with:
           toolchain: stable
           override: true
-      - name: Install Solana v1.18.18
+      - name: Install Solana v1.18.18 (bypassing SSL)
         run: |
-          sh -c "$(curl -sSfL https://release.solana.com/v1.18.18/install)"
+          sh -c "$(curl -k -sSfL https://release.solana.com/v1.18.18/install)"  # Insecure flag added
           export PATH="/home/runner/.local/share/solana/install/active_release/bin:$PATH"
           solana --version
           solana-keygen new --no-bip39-passphrase
